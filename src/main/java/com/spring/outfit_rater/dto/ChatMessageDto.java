@@ -32,15 +32,4 @@ public class ChatMessageDto {
                 .createdAt(entity.getCreatedAt())
                 .build();
     }
-    
-    public ChatMessage toEntity() {
-        return ChatMessage.builder()
-                .id(this.id)
-                .userIp(this.userIp)
-                .message(this.message)
-                .imageUrl(this.imageUrl)
-                .messageType(this.messageType)
-                .createdAt(this.createdAt)
-                .build();
-    }
 }

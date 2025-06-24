@@ -23,7 +23,7 @@ public class ChatMessage {
     @Column(nullable = false)
     private String userIp;
     
-    @Column(nullable = false, length = 1000)
+    @Column(nullable = false, length = 2000)
     private String message;
     
     @Column(name = "image_url")

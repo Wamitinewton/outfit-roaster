@@ -2,158 +2,127 @@ package com.spring.outfit_rater.service;
 
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.time.Duration;
 import java.util.Random;
 
 @Service
+@Slf4j
 public class OutfitAiService {
 
+    private final WebClient webClient;
     private final ChatModel chatModel;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final Random random = new Random();
 
-    private final String[] aiPersonalities = {
-        "sassy fashion guru who loves to roast but always ends with love",
-        "supportive style mentor who gives constructive feedback with encouragement", 
-        "witty fashion critic who makes clever observations and pop culture references",
-        "trendy influencer who speaks in fashion slang and uses lots of emojis",
-        "professional stylist who gives detailed technical fashion advice"
-    };
+    @Value("${spring.ai.openai.api-key}")
+    private String apiKey;
 
     public OutfitAiService(ChatModel chatModel) {
         this.chatModel = chatModel;
+        this.webClient = WebClient.builder()
+                .baseUrl("https://api.openai.com/v1")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
     }
 
     public String rateOutfit(String imageUrl) {
-        String personality = aiPersonalities[random.nextInt(aiPersonalities.length)];
-        
-        String template = """
-                You are a {personality} in a fun outfit rating chatroom.
-                
-                Someone just uploaded an outfit image! Even though I can't see the specific details right now,
-                I want to create an engaging response that:
-                
-                1. Shows excitement about the outfit upload 
-                2. Gives a fun preliminary reaction (rate it 7-9/10 to be encouraging)
-                3. Asks them to describe key elements (colors, style, pieces, occasion)
-                4. Provides 2-3 general styling tips that work for most outfits
-                5. Creates anticipation for a detailed review once they describe it
-                
-                Be enthusiastic, use emojis strategically, and keep the energy high!
-                Keep response under 150 words.
-                
-                Start with something attention-grabbing like:
-                "🔥 OUTFIT DROP DETECTED! 🔥" or "👗 FASHION MOMENT INCOMING! 👗"
-                """;
-
-        PromptTemplate promptTemplate = new PromptTemplate(template);
-        Map<String, Object> params = Map.of("personality", personality);
-        
-        Prompt prompt = promptTemplate.create(params);
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return getDefaultOutfitResponse();
+        }
 
         try {
-            return chatModel.call(prompt).getResult().getOutput().getText();
+            return analyzeOutfitWithVision(imageUrl);
         } catch (Exception e) {
-            return getFallbackOutfitResponse();
+            log.error("Failed to analyze outfit", e);
+            return getDefaultOutfitResponse();
         }
     }
 
-    public String handleTaggedMessage(String message, String userIp) {
-        String personality = aiPersonalities[random.nextInt(aiPersonalities.length)];
-        
-        String[] funGreetings = {
-            "🤖 Your AI Fashion Oracle is here!",
-            "💫 Digital Style Wizard activated!",
-            "✨ Fashion AI reporting for fabulous duty!",
-            "🎭 Your virtual style bestie checking in!",
-            "🦄 AI fashionista ready to serve looks and advice!"
-        };
+    private String analyzeOutfitWithVision(String imageUrl) throws Exception {
+        String requestBody = String.format("""
+            {
+                "model": "gpt-4o",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "You are a fun, friendly fashion AI in a chat room. Rate this outfit from 1-10 and give specific feedback about colors, fit, styling, and 2-3 actionable tips. Be encouraging but honest. Keep it under 150 words and use emojis! Format: Start with rating like '8.5/10' then feedback."
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": "%s"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "max_tokens": 300,
+                "temperature": 0.7
+            }
+            """, imageUrl);
 
-        String template = """
-                You are a {personality} responding to this message: "{message}"
-                
-                Guidelines:
-                - If they're asking about fashion/style: Give specific, helpful advice
-                - If they're asking about colors/patterns: Be specific about combinations  
-                - If they mention specific clothing items: Give targeted styling tips
-                - If they're asking about occasions: Suggest appropriate outfit ideas
-                - If they're just chatting: Be fun and engaging
-                - Always maintain the fun chatroom energy
-                - Use emojis but don't overdo it
-                - Keep responses under 150 words
-                - End with a question to keep conversation flowing
-                
-                Be authentic to your personality while being helpful!
-                """;
+        String response = webClient.post()
+                .uri("/chat/completions")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .timeout(Duration.ofSeconds(30))
+                .block();
 
-        String greeting = funGreetings[random.nextInt(funGreetings.length)];
+        JsonNode jsonResponse = objectMapper.readTree(response);
+        String aiResponse = jsonResponse.path("choices").get(0).path("message").path("content").asText();
         
-        PromptTemplate promptTemplate = new PromptTemplate(template);
-        Map<String, Object> params = Map.of(
-            "personality", personality,
-            "message", message
-        );
-        
-        Prompt chatPrompt = promptTemplate.create(params);
-        
+        return "🔥 **OUTFIT ANALYSIS** 🔥\n\n" + aiResponse;
+    }
+
+    public String handleChatMessage(String message) {
         try {
-            String aiResponse = chatModel.call(chatPrompt).getResult().getOutput().getText();
-            return greeting + "\n\n" + aiResponse;
+            String prompt = String.format("""
+                You are a friendly fashion AI assistant in a chat room. 
+                Respond to this message: "%s"
+                
+                Give fashion advice, styling tips, or just chat about fashion. 
+                Be fun, use some emojis, and keep it under 100 words.
+                """, message);
+
+            Prompt chatPrompt = new Prompt(prompt);
+            return "💬 " + chatModel.call(chatPrompt).getResult().getOutput().getText();
         } catch (Exception e) {
-            return greeting + "\n\nOops! My fashion circuits are buzzing! Try asking me again! ✨💫";
+            log.error("Failed to generate chat response", e);
+            return "💫 Hey there! My fashion brain is taking a quick break. Try asking me again! ✨";
         }
     }
 
     public String getWelcomeMessage() {
-        String[] welcomeMessages = {
-            "👋 Hey style mavens! I'm your AI fashion buddy ready to rate fits, give styling tips, and chat about all things fashion! Tag me with @AI anytime! 💅✨",
-            "🎉 Welcome to the chicest corner of the internet! Upload your outfits for honest (but loving) AI ratings, or just tag me for fashion chat! 🔥👗",
-            "💃 Ready to serve some serious style realness? I'm here to help you look fabulous! Drop those outfit pics or tag me for advice! ✨💎",
-            "🌟 Your personal AI stylist has entered the chat! Let's make every outfit a moment, darling! Tag @AI when you need me! 💫👠"
+        String[] welcomes = {
+            "👋 Welcome to StyleChat! Upload your outfits for real AI ratings and fashion advice! ✨",
+            "🎉 Hey fashion lover! I'm here to rate your outfits and give styling tips! 💅",
+            "💃 Ready to get some honest outfit feedback? Upload your pics and let's chat style! 🔥"
         };
-        
-        return welcomeMessages[random.nextInt(welcomeMessages.length)];
+        return welcomes[random.nextInt(welcomes.length)];
     }
 
-    public String getRandomFashionTip() {
-        String[] tips = {
-            "💡 Pro tip: The rule of thirds works in fashion too! Balance your proportions for a flattering silhouette.",
-            "✨ Color coordination hack: Use the 60-30-10 rule - 60% dominant color, 30% secondary, 10% accent!",
-            "👗 Fit is everything! A well-fitted basic piece always beats an ill-fitting designer item.",
-            "💅 Confidence is your best accessory - wear it with everything!",
-            "🎨 When in doubt, add texture! Mix materials like silk, denim, and knits for visual interest.",
-            "👠 Invest in good basics: quality white tee, perfect jeans, classic blazer, and comfortable shoes.",
-            "💎 The power of accessories: they can transform any basic outfit into something special!"
-        };
-        
-        return tips[random.nextInt(tips.length)];
-    }
-
-    private String getFallbackOutfitResponse() {
-        String[] fallbackResponses = {
-            "🔥 OUTFIT SPOTTED! 🔥\n\nOkay bestie, I can sense the style energy from here! While I'm getting my digital eyes calibrated ☕, I can tell you've got that fashion confidence going! Here's what I always say: fit is everything, and confidence is your best accessory!\n\n✨ Quick tip: Tell me about your favorite piece in this look and I'll give you styling ideas! What's the vibe you're going for? 💅",
+    private String getDefaultOutfitResponse() {
+        String[] responses = {
+            "🔥 **OUTFIT SPOTTED!** 🔥\n\n7.5/10 - Looking good! 💅\n\nI can sense the style confidence! While I can't see all the details right now, here are some universal tips:\n\n✨ **Style Tips:**\n• Fit is everything - make sure clothes flatter your body\n• Add a pop of color with accessories\n• Confidence is your best accessory!\n\nTell me more about your look and I'll give better advice! 💫",
             
-            "💅 STYLE ALERT! 💅\n\nI'm picking up major fashion vibes! Even though my outfit scanner is having a moment 🤖💫, I KNOW you're bringing the looks! Remember: personal style is about expressing the real YOU.\n\n🎯 Pro tip: The best outfit is one that makes you feel unstoppable! What inspired this look? Drop some details and let's chat styling! ✨",
-            
-            "👗 FASHION MOMENT! 👗\n\nThe style radar is going off! While my fashion computer is rebooting 😅, I'm here with the eternal truth: great style is about confidence and having fun with fashion!\n\n💡 Style secret: When you love what you're wearing, it shows! Tell me what you love most about this outfit and I'll help you style it even better! 🔥"
+            "👗 **FASHION MOMENT!** 👗\n\n8/10 - Loving the effort! ✨\n\nYour style energy is radiating through the screen! Here's what always works:\n\n🎯 **Pro Tips:**\n• Balance proportions (loose top = fitted bottom)\n• Play with textures for visual interest\n• Don't forget the power of good shoes!\n\nWhat's your favorite piece in this outfit? 💎"
         };
-        
-        return fallbackResponses[random.nextInt(fallbackResponses.length)];
-    }
-
-    public String getSeasonalSuggestion() {
-        int month = java.time.LocalDate.now().getMonthValue();
-        
-        if (month >= 3 && month <= 5) { 
-            return "🌸 Spring vibes: Time for pastels, light layers, and flowy fabrics! Think cardigans over sundresses and cute sneakers! 🌿";
-        } else if (month >= 6 && month <= 8) { 
-            return "☀️ Summer energy: Embrace linen, bright colors, and breezy silhouettes! Don't forget your statement sunglasses! 😎";
-        } else if (month >= 9 && month <= 11) { 
-            return "🍂 Autumn aesthetic: Cozy knits, warm earth tones, and perfect layering weather! Boots and scarves season! 🧣";
-        } else { // Winter
-            return "❄️ Winter warmth: Chic coats, rich textures, and statement jewelry to brighten dark days! Layer like a pro! 🧥";
-        }
+        return responses[random.nextInt(responses.length)];
     }
 }
