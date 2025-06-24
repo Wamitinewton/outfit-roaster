@@ -1,15 +1,14 @@
 package com.spring.outfit_rater.controller;
 
+import com.spring.outfit_rater.dto.ChatMessageDto;
+import com.spring.outfit_rater.model.ChatMessage;
+import com.spring.outfit_rater.service.AiService;
+import com.spring.outfit_rater.service.ChatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-
-import com.spring.outfit_rater.dto.ChatMessageDto;
-import com.spring.outfit_rater.model.ChatMessage;
-import com.spring.outfit_rater.service.ChatService;
-import com.spring.outfit_rater.service.OutfitAiService;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -18,23 +17,25 @@ import java.util.concurrent.CompletableFuture;
 public class WebSocketController {
 
     private final ChatService chatService;
-    private final OutfitAiService aiService;
+    private final AiService aiService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public WebSocketController(ChatService chatService, OutfitAiService aiService, SimpMessagingTemplate messagingTemplate) {
+    public WebSocketController(ChatService chatService, AiService aiService, SimpMessagingTemplate messagingTemplate) {
         this.chatService = chatService;
         this.aiService = aiService;
         this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping("/chat.sendMessage")
+    @MessageMapping("/chat.message")
     @SendTo("/topic/public")
     public ChatMessageDto sendMessage(ChatMessageDto message) {
         try {
+            message.setType(ChatMessage.MessageType.USER);
             ChatMessage saved = chatService.saveMessage(message);
             
-            if (message.getMessage().toLowerCase().contains("@ai")) {
-                handleAiMention(message.getMessage());
+            if (message.getContent().toLowerCase().contains("@ai") || 
+                message.getContent().toLowerCase().contains("@styleai")) {
+                handleAiResponse(message.getContent(), message.getUserId());
             }
             
             return ChatMessageDto.fromEntity(saved);
@@ -44,19 +45,19 @@ public class WebSocketController {
         }
     }
 
-    @MessageMapping("/chat.uploadOutfit")
+    @MessageMapping("/chat.outfit")
     @SendTo("/topic/public")
-    public ChatMessageDto uploadOutfit(ChatMessageDto message) {
+    public ChatMessageDto shareOutfit(ChatMessageDto message) {
         try {
-            message.setMessageType(ChatMessage.MessageType.OUTFIT_UPLOAD);
+            message.setType(ChatMessage.MessageType.OUTFIT);
             ChatMessage saved = chatService.saveMessage(message);
             
-            handleOutfitRating(message.getImageUrl());
+            handleOutfitAnalysis(message.getImageUrl(), message.getUserId());
             
             return ChatMessageDto.fromEntity(saved);
         } catch (Exception e) {
-            log.error("Error uploading outfit", e);
-            return createErrorMessage("Failed to upload outfit");
+            log.error("Error sharing outfit", e);
+            return createErrorMessage("Failed to share outfit");
         }
     }
 
@@ -64,52 +65,55 @@ public class WebSocketController {
     @SendTo("/topic/public")
     public ChatMessageDto userJoined(ChatMessageDto message) {
         return ChatMessageDto.builder()
-                .userIp("AI")
-                .message(aiService.getWelcomeMessage())
-                .messageType(ChatMessage.MessageType.AI_RESPONSE)
+                .userId("StyleAI")
+                .content(aiService.getWelcomeMessage())
+                .type(ChatMessage.MessageType.AI)
                 .build();
     }
 
-    private void handleAiMention(String message) {
+    private void handleAiResponse(String userMessage, String userId) {
         CompletableFuture.runAsync(() -> {
             try {
-                String response = aiService.handleChatMessage(message);
-                sendAiMessage(response);
+                String response = aiService.handleChatMessage(userMessage, userId);
+                sendAiMessage(response, userId);
             } catch (Exception e) {
-                log.error("AI chat error", e);
-                sendAiMessage("🤖 Oops! My circuits are a bit tangled. Try again! ✨");
+                log.error("AI chat error for user: {}", userId, e);
+                sendAiMessage("I'm having a quick wardrobe malfunction! Could you try that again? 💫", userId);
             }
         });
     }
 
-    private void handleOutfitRating(String imageUrl) {
+    private void handleOutfitAnalysis(String imageUrl, String userId) {
         CompletableFuture.runAsync(() -> {
             try {
-                String rating = aiService.rateOutfit(imageUrl);
-                sendAiMessage(rating);
+                String analysis = aiService.analyzeOutfit(imageUrl, userId);
+                sendAiMessage(analysis, userId);
             } catch (Exception e) {
-                log.error("AI rating error", e);
-                sendAiMessage("🔥 Looking good! My scanner needs a coffee break ☕ but I can tell you've got style! ✨");
+                log.error("AI analysis error for user: {}", userId, e);
+                sendAiMessage("Your style is looking great! My fashion scanner needs a quick refresh. ✨", userId);
             }
         });
     }
 
-    private void sendAiMessage(String message) {
+    private void sendAiMessage(String content, String contextUserId) {
         ChatMessageDto aiMessage = ChatMessageDto.builder()
-                .userIp("AI")
-                .message(message)
-                .messageType(ChatMessage.MessageType.AI_RESPONSE)
+                .userId("StyleAI")
+                .content(content)
+                .type(ChatMessage.MessageType.AI)
                 .build();
         
+        aiMessage.setUserId(contextUserId);
         chatService.saveMessage(aiMessage);
+        
+        aiMessage.setUserId("StyleAI");
         messagingTemplate.convertAndSend("/topic/public", aiMessage);
     }
 
-    private ChatMessageDto createErrorMessage(String message) {
+    private ChatMessageDto createErrorMessage(String content) {
         return ChatMessageDto.builder()
-                .userIp("System")
-                .message(message)
-                .messageType(ChatMessage.MessageType.SYSTEM_MESSAGE)
+                .userId("System")
+                .content(content)
+                .type(ChatMessage.MessageType.USER)
                 .build();
     }
 }

@@ -1,6 +1,8 @@
 package com.spring.outfit_rater.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
+import com.spring.outfit_rater.dto.ChatMessageDto;
+import com.spring.outfit_rater.service.ChatService;
+import com.spring.outfit_rater.service.StorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -8,23 +10,20 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.spring.outfit_rater.dto.ChatMessageDto;
-import com.spring.outfit_rater.service.ChatService;
-import com.spring.outfit_rater.service.FileService;
-
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
 @Controller
 @Slf4j
-public class OutfitController {
+public class ChatController {
 
     private final ChatService chatService;
-    private final FileService fileService;
+    private final StorageService storageService;
 
-    public OutfitController(ChatService chatService, FileService fileService) {
+    public ChatController(ChatService chatService, StorageService storageService) {
         this.chatService = chatService;
-        this.fileService = fileService;
+        this.storageService = storageService;
     }
 
     @GetMapping("/")
@@ -34,21 +33,20 @@ public class OutfitController {
 
     @GetMapping("/chat")
     public String chatRoom(Model model, HttpServletRequest request) {
-        String userIp = getUserIp(request);
-        String displayName = chatService.generateDisplayName(userIp);
+        String userId = getUserId(request);
+        String displayName = chatService.generateDisplayName(userId);
         
-        model.addAttribute("userIp", userIp);
+        model.addAttribute("userId", userId);
         model.addAttribute("displayName", displayName);
         
         return "chat";
     }
 
-
     @PostMapping("/api/upload")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
-            String imageUrl = fileService.saveImage(file);
+            String imageUrl = storageService.uploadImage(file);
             return ResponseEntity.ok(Map.of(
                 "success", true,
                 "imageUrl", imageUrl
@@ -67,27 +65,33 @@ public class OutfitController {
         }
     }
 
-    @GetMapping("/api/chat/recent")
+    @GetMapping("/api/messages/recent")
     @ResponseBody
     public ResponseEntity<List<ChatMessageDto>> getRecentMessages() {
-        List<ChatMessageDto> messages = chatService.getRecentMessages();
+        List<ChatMessageDto> messages = chatService.getRecentPublicMessages();
         return ResponseEntity.ok(messages);
     }
 
-    @GetMapping("/api/user-info")
+    @GetMapping("/api/messages/{userId}")
+    @ResponseBody
+    public ResponseEntity<List<ChatMessageDto>> getUserMessages(@PathVariable String userId) {
+        List<ChatMessageDto> messages = chatService.getUserConversation(userId);
+        return ResponseEntity.ok(messages);
+    }
+
+    @GetMapping("/api/user")
     @ResponseBody
     public ResponseEntity<Map<String, String>> getUserInfo(HttpServletRequest request) {
-        String userIp = getUserIp(request);
-        String displayName = chatService.generateDisplayName(userIp);
+        String userId = getUserId(request);
+        String displayName = chatService.generateDisplayName(userId);
         
         return ResponseEntity.ok(Map.of(
-            "userIp", userIp,
+            "userId", userId,
             "displayName", displayName
         ));
     }
 
-
-    private String getUserIp(HttpServletRequest request) {
+    private String getUserId(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
             return xForwardedFor.split(",")[0].trim();

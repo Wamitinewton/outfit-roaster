@@ -1,13 +1,12 @@
 package com.spring.outfit_rater.dto;
 
+import com.spring.outfit_rater.model.ChatMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
-import com.spring.outfit_rater.model.ChatMessage;
 
 @Data
 @Builder
@@ -16,20 +15,29 @@ import com.spring.outfit_rater.model.ChatMessage;
 public class ChatMessageDto {
     
     private Long id;
-    private String userIp;
-    private String message;
+    private String userId;
+    private String content;
     private String imageUrl;
-    private ChatMessage.MessageType messageType;
+    private ChatMessage.MessageType type;
     private LocalDateTime createdAt;
     
     public static ChatMessageDto fromEntity(ChatMessage entity) {
         return ChatMessageDto.builder()
                 .id(entity.getId())
-                .userIp(entity.getUserIp())
-                .message(entity.getMessage())
+                .userId(entity.getUserId())
+                .content(entity.getContent())
                 .imageUrl(entity.getImageUrl())
-                .messageType(entity.getMessageType())
+                .type(entity.getType())
                 .createdAt(entity.getCreatedAt())
+                .build();
+    }
+    
+    public ChatMessage toEntity() {
+        return ChatMessage.builder()
+                .userId(this.userId)
+                .content(this.content)
+                .imageUrl(this.imageUrl)
+                .type(this.type != null ? this.type : ChatMessage.MessageType.USER)
                 .build();
     }
 }
