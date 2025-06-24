@@ -152,7 +152,7 @@ public class OutfitAiService {
             return "☀️ Summer energy: Embrace linen, bright colors, and breezy silhouettes! Don't forget your statement sunglasses! 😎";
         } else if (month >= 9 && month <= 11) { 
             return "🍂 Autumn aesthetic: Cozy knits, warm earth tones, and perfect layering weather! Boots and scarves season! 🧣";
-        } else { 
+        } else { // Winter
             return "❄️ Winter warmth: Chic coats, rich textures, and statement jewelry to brighten dark days! Layer like a pro! 🧥";
         }
     }
