@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -20,7 +21,7 @@ public class StorageService {
     private String bucketName;
 
     private static final String FOLDER_NAME = "outfits/";
-    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; 
 
     public String uploadImage(MultipartFile file) {
         validateImage(file);
@@ -37,11 +38,16 @@ public class StorageService {
                     .build();
 
             storage.create(blobInfo, file.getBytes());
+            String signedUrl = storage.signUrl(
+                blobInfo, 
+                7, 
+                TimeUnit.DAYS,
+                Storage.SignUrlOption.withV4Signature()
+            ).toString();
             
-            String publicUrl = String.format("https://storage.googleapis.com/%s/%s", bucketName, fullPath);
-            log.info("Image uploaded successfully: {}", publicUrl);
+            log.info("Image uploaded successfully with signed URL: {}", signedUrl);
             
-            return publicUrl;
+            return signedUrl;
             
         } catch (IOException e) {
             log.error("Failed to upload image", e);

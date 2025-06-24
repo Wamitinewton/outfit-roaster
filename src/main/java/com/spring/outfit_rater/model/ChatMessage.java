@@ -26,8 +26,8 @@ public class ChatMessage {
     @Column(nullable = false, length = 2000)
     private String content;
     
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "image_url", length = 2000)
+private String imageUrl;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
