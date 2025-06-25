@@ -2,6 +2,7 @@ package com.spring.outfit_rater.controller;
 
 import com.spring.outfit_rater.dto.ChatMessageDto;
 import com.spring.outfit_rater.service.ChatService;
+import com.spring.outfit_rater.service.RoomService;
 import com.spring.outfit_rater.service.StorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +21,12 @@ public class ChatController {
 
     private final ChatService chatService;
     private final StorageService storageService;
+    private final RoomService roomService;
 
-    public ChatController(ChatService chatService, StorageService storageService) {
+    public ChatController(ChatService chatService, StorageService storageService, RoomService roomService) {
         this.chatService = chatService;
         this.storageService = storageService;
+        this.roomService = roomService;
     }
 
     @GetMapping("/")
@@ -38,6 +41,22 @@ public class ChatController {
         
         model.addAttribute("userId", userId);
         model.addAttribute("displayName", displayName);
+        
+        return "chat";
+    }
+
+    @GetMapping("/room/{roomCode}")
+    public String roomChat(@PathVariable String roomCode, Model model, HttpServletRequest request) {
+        String userId = getUserId(request);
+        String displayName = chatService.generateDisplayName(userId);
+        
+        if (!roomService.isUserInRoom(roomCode, userId) && !roomService.canUserJoinRoom(roomCode, userId)) {
+            return "redirect:/chat?error=room_access_denied";
+        }
+        
+        model.addAttribute("userId", userId);
+        model.addAttribute("displayName", displayName);
+        model.addAttribute("roomCode", roomCode.toUpperCase());
         
         return "chat";
     }
@@ -72,10 +91,44 @@ public class ChatController {
         return ResponseEntity.ok(messages);
     }
 
+    @GetMapping("/api/messages/room/{roomCode}")
+    @ResponseBody
+    public ResponseEntity<List<ChatMessageDto>> getRoomMessages(@PathVariable String roomCode,
+                                                               @RequestParam(defaultValue = "50") int limit,
+                                                               HttpServletRequest request) {
+        String userId = getUserId(request);
+        
+        if (!roomService.isUserInRoom(roomCode, userId)) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        
+        List<ChatMessageDto> messages = chatService.getRoomMessages(roomCode, limit);
+        return ResponseEntity.ok(messages);
+    }
+
     @GetMapping("/api/messages/{userId}")
     @ResponseBody
     public ResponseEntity<List<ChatMessageDto>> getUserMessages(@PathVariable String userId) {
         List<ChatMessageDto> messages = chatService.getUserConversation(userId);
+        return ResponseEntity.ok(messages);
+    }
+
+    @GetMapping("/api/messages/{userId}/room/{roomCode}")
+    @ResponseBody
+    public ResponseEntity<List<ChatMessageDto>> getUserRoomMessages(@PathVariable String userId,
+                                                                   @PathVariable String roomCode,
+                                                                   HttpServletRequest request) {
+        String requestUserId = getUserId(request);
+        
+        if (!requestUserId.equals(userId)) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        
+        if (!roomService.isUserInRoom(roomCode, userId)) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        
+        List<ChatMessageDto> messages = chatService.getUserRoomConversation(userId, roomCode);
         return ResponseEntity.ok(messages);
     }
 
@@ -89,6 +142,21 @@ public class ChatController {
             "userId", userId,
             "displayName", displayName
         ));
+    }
+
+    @PostMapping("/api/activity/room/{roomCode}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateRoomActivity(@PathVariable String roomCode,
+                                                                 HttpServletRequest request) {
+        String userId = getUserId(request);
+        
+        try {
+            roomService.updateParticipantActivity(roomCode, userId);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            log.warn("Failed to update room activity for user {} in room {}", userId, roomCode);
+            return ResponseEntity.ok(Map.of("success", false));
+        }
     }
 
     private String getUserId(HttpServletRequest request) {

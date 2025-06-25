@@ -194,7 +194,7 @@ public class AiService {
                 .replaceAll("\\*\\*(.*?)\\*\\*", "$1")
                 .replaceAll("\\*(.*?)\\*", "$1")
                 .replaceAll("•", "💀")
-                .replaceAll("- ", "🔥 ")
+                .replaceAll("- ", "🔥 ")    
                 .trim();
 
         return formatted;

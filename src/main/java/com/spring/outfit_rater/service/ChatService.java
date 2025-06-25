@@ -26,24 +26,45 @@ public class ChatService {
 
     @Transactional
     public ChatMessage saveMessage(ChatMessageDto dto) {
-        ensureConversationExists(dto.getUserId());
+        if (dto.getRoomCode() == null || dto.getRoomCode().trim().isEmpty()) {
+            ensureConversationExists(dto.getUserId());
+        }
         
         ChatMessage message = dto.toEntity();
         ChatMessage saved = messageRepository.save(message);
         
-        log.info("Message saved - User: {}, Type: {}", dto.getUserId(), dto.getType());
+        log.info("Message saved - User: {}, Type: {}, Room: {}", 
+                dto.getUserId(), dto.getType(), dto.getRoomCode());
         return saved;
     }
 
+    @Transactional(readOnly = true)
     public List<ChatMessageDto> getRecentPublicMessages() {
-        return messageRepository.findTop50ByOrderByCreatedAtDesc()
+        return messageRepository.findRecentGlobalMessages()
                 .stream()
                 .map(ChatMessageDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<ChatMessageDto> getRoomMessages(String roomCode, int limit) {
+        return messageRepository.findRecentRoomMessages(roomCode.toUpperCase(), limit)
+                .stream()
+                .map(ChatMessageDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<ChatMessageDto> getUserConversation(String userId) {
         return messageRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(ChatMessageDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatMessageDto> getUserRoomConversation(String userId, String roomCode) {
+        return messageRepository.findByUserIdAndRoomCodeOrderByCreatedAtDesc(userId, roomCode.toUpperCase())
                 .stream()
                 .map(ChatMessageDto::fromEntity)
                 .collect(Collectors.toList());
@@ -60,8 +81,10 @@ public class ChatService {
     }
 
     public String generateDisplayName(String userId) {
-        String[] adjectives = {"Stylish", "Trendy", "Chic", "Elegant", "Dapper", "Sophisticated"};
-        String[] nouns = {"Fashionista", "StyleIcon", "TrendSetter", "Designer", "Curator", "Maven"};
+        String[] adjectives = {"Stylish", "Trendy", "Chic", "Elegant", "Dapper", "Sophisticated", 
+                              "Bold", "Classy", "Hip", "Cool", "Fresh", "Sleek"};
+        String[] nouns = {"Fashionista", "StyleIcon", "TrendSetter", "Designer", "Curator", "Maven",
+                         "Critic", "Guru", "Expert", "Enthusiast", "Connoisseur", "Influencer"};
         
         int hash = Math.abs(userId.hashCode());
         return adjectives[hash % adjectives.length] + 
