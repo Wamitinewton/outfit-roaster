@@ -21,10 +21,11 @@
             overflow-x: hidden;
         }
 
+        /* Header */
         .header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            padding: 1rem 2rem;
+            padding: 0.75rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -36,7 +37,7 @@
         }
 
         .logo {
-            font-size: 1.75rem;
+            font-size: 1.25rem;
             font-weight: 700;
             background: linear-gradient(135deg, #667eea, #764ba2);
             -webkit-background-clip: text;
@@ -49,7 +50,7 @@
         .header-controls {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .room-indicator {
@@ -58,10 +59,21 @@
             gap: 0.5rem;
             background: linear-gradient(135deg, #10b981, #34d399);
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
             font-weight: 500;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .room-indicator:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
         .room-indicator.active {
@@ -69,17 +81,17 @@
         }
 
         .user-info {
-            color: #6b7280;
-            font-size: 0.9rem;
-            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            color: #6b7280;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
         .user-avatar {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: linear-gradient(135deg, #667eea, #764ba2);
             display: flex;
@@ -87,45 +99,73 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
+        .user-name {
+            display: none;
+        }
+
+        /* Mobile Menu Button */
+        .menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-btn:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        /* Main Container */
         .main-container {
             flex: 1;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 320px;
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
-            gap: 2rem;
-            padding: 2rem;
-            align-items: flex-start;
+            gap: 1.5rem;
+            padding: 1rem;
+            align-items: start;
+            min-height: calc(100vh - 80px);
         }
 
+        /* Chat Area */
         .chat-area {
-            flex: 1;
             background: rgba(255, 255, 255, 0.98);
-            border-radius: 24px;
+            border-radius: 20px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            min-height: calc(100vh - 180px);
+            height: calc(100vh - 100px);
         }
 
         .chat-header {
-            padding: 1.5rem 2rem;
+            padding: 1rem 1.5rem;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             border-bottom: 1px solid rgba(0, 0, 0, 0.06);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
         }
 
         .chat-status {
             display: flex;
             align-items: center;
             gap: 1rem;
+            flex: 1;
+            min-width: 0;
         }
 
         .ai-status {
@@ -134,30 +174,41 @@
             gap: 0.75rem;
             color: #374151;
             font-weight: 500;
+            font-size: 0.9rem;
+            flex: 1;
+            min-width: 0;
         }
 
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: linear-gradient(135deg, #10b981, #34d399);
             border-radius: 50%;
             animation: pulse 2s infinite;
-            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            flex-shrink: 0;
+        }
+
+        .status-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .room-controls {
             display: flex;
             gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .btn-small {
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             white-space: nowrap;
         }
 
@@ -172,19 +223,29 @@
             color: #374151;
         }
 
+        .btn-share {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        .btn-share:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Messages Container */
         .messages-container {
             flex: 1;
             overflow-y: auto;
-            padding: 2rem;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
-            max-height: calc(100vh - 360px);
+            gap: 1rem;
             scroll-behavior: smooth;
         }
 
         .messages-container::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
 
         .messages-container::-webkit-scrollbar-track {
@@ -193,12 +254,12 @@
 
         .messages-container::-webkit-scrollbar-thumb {
             background: rgba(0, 0, 0, 0.1);
-            border-radius: 3px;
+            border-radius: 2px;
         }
 
         .message {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             animation: slideInUp 0.4s ease-out;
             max-width: 85%;
             align-items: flex-start;
@@ -216,18 +277,18 @@
 
         .message.system {
             align-self: center;
-            max-width: 70%;
+            max-width: 90%;
         }
 
         .message-avatar {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             flex-shrink: 0;
         }
 
@@ -249,9 +310,9 @@
 
         .message-content {
             background: white;
-            padding: 1.25rem 1.5rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 1rem;
+            border-radius: 16px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.05);
             position: relative;
             max-width: 100%;
@@ -260,61 +321,63 @@
 
         .message.ai .message-content {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border-radius: 20px 20px 20px 4px;
+            border-radius: 16px 16px 16px 4px;
         }
 
         .message.user .message-content,
         .message.outfit .message-content {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border-radius: 20px 20px 4px 20px;
+            border-radius: 16px 16px 4px 16px;
         }
 
         .message.system .message-content {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-radius: 16px;
+            border-radius: 12px;
             text-align: center;
             font-style: italic;
         }
 
         .message-meta {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #6b7280;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
             font-weight: 500;
         }
 
         .message-text {
             color: #374151;
-            line-height: 1.6;
-            font-size: 0.95rem;
+            line-height: 1.5;
+            font-size: 0.9rem;
         }
 
         .message img {
-            max-width: 250px;
-            border-radius: 16px;
-            margin-top: 0.75rem;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            max-width: 200px;
+            border-radius: 12px;
+            margin-top: 0.5rem;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        /* Input Area */
         .input-area {
-            padding: 2rem;
+            padding: 1rem;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             border-top: 1px solid rgba(0, 0, 0, 0.06);
+            flex-shrink: 0;
         }
 
         .input-container {
             max-width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .upload-area {
             display: none;
-            padding: 2rem;
+            padding: 1.5rem;
             border: 2px dashed #cbd5e1;
-            border-radius: 16px;
+            border-radius: 12px;
             text-align: center;
             background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
             transition: all 0.3s ease;
@@ -325,7 +388,6 @@
             display: block;
             border-color: #667eea;
             background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
-            transform: scale(1.02);
         }
 
         .upload-area:hover {
@@ -336,35 +398,34 @@
         .upload-text {
             color: #6b7280;
             font-weight: 500;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .input-row {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             align-items: flex-end;
         }
 
         .message-input {
             flex: 1;
-            padding: 1.25rem 1.5rem;
+            padding: 1rem;
             border: 2px solid #e2e8f0;
-            border-radius: 20px;
+            border-radius: 16px;
             background: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
             resize: none;
-            min-height: 56px;
-            max-height: 140px;
+            min-height: 48px;
+            max-height: 120px;
             transition: all 0.3s ease;
             font-family: inherit;
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
         .message-input:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-            transform: translateY(-1px);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .message-input::placeholder {
@@ -373,39 +434,40 @@
 
         .input-controls {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .btn {
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.25rem;
             border: none;
-            border-radius: 20px;
+            border-radius: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.95rem;
+            gap: 0.4rem;
+            font-size: 0.85rem;
             white-space: nowrap;
-            min-height: 56px;
+            min-height: 48px;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
         }
 
         .btn-secondary {
             background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+            box-shadow: 0 3px 12px rgba(6, 182, 212, 0.3);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
         .btn:active {
@@ -418,28 +480,30 @@
             transform: none;
         }
 
+        /* Sidebar */
         .sidebar {
-            width: 320px;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1.25rem;
             position: sticky;
-            top: 120px;
+            top: 100px;
             height: fit-content;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
         }
 
         .sidebar-section {
             background: rgba(255, 255, 255, 0.98);
-            border-radius: 24px;
-            padding: 2rem;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .sidebar h3 {
             color: #1f2937;
-            margin-bottom: 1.5rem;
-            font-size: 1.25rem;
+            margin-bottom: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -459,10 +523,10 @@
 
         .room-code-input input {
             flex: 1;
-            padding: 0.75rem 1rem;
+            padding: 0.75rem;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 0.9rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
             text-transform: uppercase;
             font-weight: 600;
             letter-spacing: 1px;
@@ -478,37 +542,111 @@
             background: linear-gradient(135deg, #10b981, #34d399);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 0.85rem;
         }
 
         .room-code-input button:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 3px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .current-room {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .current-room h4 {
+            color: #667eea;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .room-code-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .copy-code-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .copy-code-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .copy-code-btn.copied {
+            background: linear-gradient(135deg, #10b981, #34d399);
         }
 
         .tips {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .tip {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            padding: 1.25rem;
-            border-radius: 16px;
-            font-size: 0.9rem;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
             color: #4b5563;
-            line-height: 1.5;
+            line-height: 1.4;
             border: 1px solid rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
 
         .tip:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Mobile Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
         }
 
         /* Modals */
@@ -523,6 +661,7 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            padding: 1rem;
         }
 
         .modal.active {
@@ -531,11 +670,11 @@
 
         .modal-content {
             background: white;
-            border-radius: 24px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
+            border-radius: 20px;
+            padding: 1.5rem;
+            max-width: 450px;
+            width: 100%;
+            max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
         }
@@ -544,11 +683,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .modal-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: #1f2937;
         }
@@ -570,7 +709,7 @@
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .form-label {
@@ -578,21 +717,22 @@
             margin-bottom: 0.5rem;
             font-weight: 500;
             color: #374151;
+            font-size: 0.9rem;
         }
 
         .form-input {
             width: 100%;
-            padding: 1rem;
+            padding: 0.875rem;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
         }
 
         .form-input:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .form-textarea {
@@ -601,28 +741,103 @@
         }
 
         .form-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
 
-        .form-row .form-group {
-            flex: 1;
+        /* Room Code Display Modal */
+        .room-code-modal-display {
+            text-align: center;
+            padding: 1rem 0;
         }
 
-        .loading {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
+        .room-code-box {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #667eea;
+            position: relative;
+        }
+
+        .copy-btn {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 20px;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .copy-btn.copied {
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+
+        .share-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .share-btn {
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+            color: #6b7280;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .share-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            background: #f0f7ff;
+        }
+
+        /* Loading indicator */
+        .loading {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.875rem 1.25rem;
+            border-radius: 16px;
             display: none;
             align-items: center;
             gap: 0.75rem;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
             font-weight: 500;
             z-index: 1000;
+            max-width: calc(100vw - 3rem);
+            font-size: 0.9rem;
         }
 
         .loading.active {
@@ -631,14 +846,16 @@
         }
 
         .spinner {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-top: 2px solid white;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            flex-shrink: 0;
         }
 
+        /* Animations */
         @keyframes slideInUp {
             from {
                 opacity: 0;
@@ -660,101 +877,281 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Mobile Responsive */
+        /* Mobile Responsive Breakpoints */
         @media (max-width: 1024px) {
             .main-container {
-                flex-direction: column;
-                padding: 1rem;
-                gap: 1rem;
+                grid-template-columns: 1fr;
+                gap: 0;
+                padding: 0;
             }
             
             .sidebar {
-                width: 100%;
-                order: -1;
-                position: static;
-                flex-direction: row;
-                overflow-x: auto;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 320px;
+                height: 100vh;
+                background: white;
+                z-index: 1000;
+                padding: 1rem;
+                transition: right 0.3s ease;
+                overflow-y: auto;
+                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
             }
             
-            .sidebar-section {
-                min-width: 280px;
+            .sidebar.active {
+                right: 0;
+            }
+            
+            .menu-btn {
+                display: block;
             }
             
             .chat-area {
-                min-height: calc(100vh - 300px);
+                height: calc(100vh - 80px);
+                border-radius: 0;
+                margin: 0;
+            }
+            
+            .user-name {
+                display: none;
             }
         }
 
         @media (max-width: 768px) {
             .header {
-                padding: 1rem;
-            }
-            
-            .header-controls {
-                gap: 0.5rem;
+                padding: 0.75rem 1rem;
             }
             
             .logo {
-                font-size: 1.5rem;
+                font-size: 1.1rem;
             }
             
-            .main-container {
-                padding: 0.5rem;
+            .room-indicator {
+                max-width: 120px;
+                font-size: 0.75rem;
+                padding: 0.3rem 0.6rem;
+            }
+            
+            .user-avatar {
+                width: 24px;
+                height: 24px;
+                font-size: 0.75rem;
+            }
+            
+            .chat-header {
+                padding: 0.875rem 1rem;
+            }
+            
+            .ai-status {
+                font-size: 0.8rem;
+            }
+            
+            .status-dot {
+                width: 6px;
+                height: 6px;
+            }
+            
+            .btn-small {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
             }
             
             .messages-container {
-                padding: 1rem;
-                max-height: calc(100vh - 320px);
+                padding: 0.875rem;
             }
             
             .message {
                 max-width: 95%;
+                gap: 0.5rem;
+            }
+            
+            .message-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+            
+            .message-content {
+                padding: 0.875rem;
+            }
+            
+            .message-meta {
+                font-size: 0.65rem;
+            }
+            
+            .message-text {
+                font-size: 0.85rem;
+            }
+            
+            .message img {
+                max-width: 180px;
             }
             
             .input-area {
-                padding: 1rem;
+                padding: 0.875rem;
             }
             
             .input-row {
                 flex-direction: column;
-                align-items: stretch;
+                gap: 0.75rem;
             }
             
             .input-controls {
-                justify-content: space-between;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
             }
             
             .btn {
-                flex: 1;
                 justify-content: center;
+                padding: 0.875rem;
+                font-size: 0.8rem;
             }
             
             .sidebar {
-                flex-direction: column;
+                width: 100%;
+                right: -100%;
             }
             
-            .sidebar-section {
-                min-width: auto;
+            .modal-content {
+                margin: 0.5rem;
+                padding: 1.25rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            .room-code-box {
+                font-size: 1.25rem;
+                padding: 1.25rem;
+            }
+            
+            .share-options {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
             }
         }
 
         @media (max-width: 480px) {
+            .header {
+                padding: 0.6rem 0.875rem;
+            }
+            
+            .logo {
+                font-size: 1rem;
+            }
+            
+            .room-indicator {
+                max-width: 100px;
+                font-size: 0.7rem;
+            }
+            
+            .user-info {
+                font-size: 0.75rem;
+            }
+            
+            .user-avatar {
+                width: 22px;
+                height: 22px;
+                font-size: 0.7rem;
+            }
+            
+            .chat-header {
+                padding: 0.75rem;
+            }
+            
+            .messages-container {
+                padding: 0.75rem;
+            }
+            
             .message-avatar {
-                width: 32px;
-                height: 32px;
-                font-size: 0.9rem;
+                width: 24px;
+                height: 24px;
+                font-size: 0.75rem;
             }
             
             .message-content {
-                padding: 1rem;
+                padding: 0.75rem;
             }
             
             .message img {
-                max-width: 200px;
+                max-width: 150px;
             }
             
-            .sidebar-section {
-                padding: 1.5rem;
+            .input-area {
+                padding: 0.75rem;
+            }
+            
+            .message-input {
+                font-size: 0.85rem;
+                padding: 0.875rem;
+            }
+            
+            .btn {
+                padding: 0.75rem;
+                font-size: 0.75rem;
+            }
+            
+            .modal-content {
+                margin: 0.25rem;
+                padding: 1rem;
+            }
+            
+            .modal-title {
+                font-size: 1.1rem;
+            }
+            
+            .form-input {
+                padding: 0.75rem;
+                font-size: 0.85rem;
+            }
+            
+            .room-code-box {
+                font-size: 1.1rem;
+                padding: 1rem;
+                letter-spacing: 1px;
+            }
+            
+            .copy-btn {
+                padding: 0.75rem;
+                font-size: 0.8rem;
+            }
+            
+            .loading {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+            }
+            
+            .spinner {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        /* Landscape mobile optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .chat-area {
+                height: calc(100vh - 60px);
+            }
+            
+            .header {
+                padding: 0.5rem 1rem;
+            }
+            
+            .messages-container {
+                max-height: calc(100vh - 200px);
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .message img {
+                image-rendering: -webkit-optimize-contrast;
             }
         }
     </style>
@@ -765,15 +1162,18 @@
             👗 StyleChat
         </div>
         <div class="header-controls">
-            <div class="room-indicator" id="roomIndicator">
+            <div class="room-indicator" id="roomIndicator" title="Click to copy room code">
                 🏠 <span id="roomName">Room Name</span>
             </div>
             <div class="user-info">
                 <div class="user-avatar" th:text="${displayName.substring(0,1)}">U</div>
-                <span th:text="${displayName}">User</span>
+                <span class="user-name" th:text="${displayName}">User</span>
             </div>
+            <button class="menu-btn" id="menuBtn">☰</button>
         </div>
     </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="main-container">
         <div class="chat-area">
@@ -781,15 +1181,15 @@
                 <div class="chat-status">
                     <div class="ai-status">
                         <div class="status-dot"></div>
-                        <span id="chatStatusText">StyleAI is ready to help</span>
+                        <span class="status-text" id="chatStatusText">StyleAI is ready to help</span>
                     </div>
                 </div>
                 <div class="room-controls">
-                    <button class="btn-small btn-outline" id="leaveRoomBtn" style="display: none;">
-                        Leave Room
+                    <button class="btn-small btn-share" id="shareRoomBtn" style="display: none;" title="Share room code">
+                        Share
                     </button>
-                    <button class="btn-small btn-outline" id="roomSettingsBtn" style="display: none;">
-                        Settings
+                    <button class="btn-small btn-outline" id="leaveRoomBtn" style="display: none;">
+                        Leave
                     </button>
                 </div>
             </div>
@@ -825,7 +1225,18 @@
             </div>
         </div>
 
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
+            <!-- Current Room Display (only shown when in a room) -->
+            <div class="sidebar-section" id="currentRoomSection" style="display: none;">
+                <div class="current-room">
+                    <h4>🏠 Current Room</h4>
+                    <div class="room-code-display" id="currentRoomCode">ABCD1234</div>
+                    <button class="copy-code-btn" id="copyCurrentRoomBtn">
+                        📋 Copy Code
+                    </button>
+                </div>
+            </div>
+
             <div class="sidebar-section">
                 <h3>🏠 Roast Rooms</h3>
                 <div class="room-actions">
@@ -888,12 +1299,48 @@
                         <input type="number" class="form-input" id="durationInput" name="durationHours" min="1" max="72" value="24">
                     </div>
                 </div>
-                <div class="room-actions" style="margin-top: 2rem;">
+                <div class="room-actions" style="margin-top: 1.5rem;">
                     <button type="submit" class="btn btn-primary">
                         Create Room 🎉
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Room Code Display Modal -->
+    <div class="modal" id="roomCodeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🎉 Room Created!</h2>
+                <button class="close-btn" id="closeRoomCodeModal">&times;</button>
+            </div>
+            <div class="room-code-modal-display">
+                <p style="color: #6b7280; margin-bottom: 1rem;">Share this code with your friends:</p>
+                <div class="room-code-box" id="roomCodeDisplay">
+                    ABCD1234
+                </div>
+                <button class="copy-btn" id="copyRoomCodeBtn">
+                    📋 Copy Room Code
+                </button>
+                <div class="share-options">
+                    <button class="share-btn" id="shareWhatsAppBtn">
+                        💬 WhatsApp
+                    </button>
+                    <button class="share-btn" id="shareTwitterBtn">
+                        🐦 Twitter
+                    </button>
+                    <button class="share-btn" id="shareTelegramBtn">
+                        ✈️ Telegram
+                    </button>
+                    <button class="share-btn" id="shareEmailBtn">
+                        📧 Email
+                    </button>
+                </div>
+                <button class="btn btn-primary" id="joinCreatedRoomBtn" style="margin-top: 1rem;">
+                    Join Room Now
+                </button>
+            </div>
         </div>
     </div>
 
@@ -914,6 +1361,7 @@
         let stompClient = null;
         let currentRoom = null;
         let isInRoom = false;
+        let createdRoomData = null;
         
         const messagesContainer = document.getElementById('messages');
         const messageInput = document.getElementById('messageInput');
@@ -924,18 +1372,118 @@
         const loadingIndicator = document.getElementById('loadingIndicator');
         const loadingText = document.getElementById('loadingText');
         
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
         const createRoomBtn = document.getElementById('createRoomBtn');
         const joinRoomBtn = document.getElementById('joinRoomBtn');
         const roomCodeInput = document.getElementById('roomCodeInput');
         const globalChatBtn = document.getElementById('globalChatBtn');
         const leaveRoomBtn = document.getElementById('leaveRoomBtn');
+        const shareRoomBtn = document.getElementById('shareRoomBtn');
         const roomIndicator = document.getElementById('roomIndicator');
         const roomName = document.getElementById('roomName');
         const chatStatusText = document.getElementById('chatStatusText');
         
+        const currentRoomSection = document.getElementById('currentRoomSection');
+        const currentRoomCode = document.getElementById('currentRoomCode');
+        const copyCurrentRoomBtn = document.getElementById('copyCurrentRoomBtn');
+        
         const createRoomModal = document.getElementById('createRoomModal');
         const createRoomForm = document.getElementById('createRoomForm');
         const closeCreateModal = document.getElementById('closeCreateModal');
+        
+        const roomCodeModal = document.getElementById('roomCodeModal');
+        const closeRoomCodeModal = document.getElementById('closeRoomCodeModal');
+        const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+        const copyRoomCodeBtn = document.getElementById('copyRoomCodeBtn');
+        const joinCreatedRoomBtn = document.getElementById('joinCreatedRoomBtn');
+        
+        const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
+        const shareTwitterBtn = document.getElementById('shareTwitterBtn');
+        const shareTelegramBtn = document.getElementById('shareTelegramBtn');
+        const shareEmailBtn = document.getElementById('shareEmailBtn');
+
+        function generateDisplayName(userId) {
+            if (userId === 'StyleAI') return 'StyleAI';
+            if (userId === displayName) return 'You';
+            
+            if (userId.includes('.') || userId.length > 10) {
+                const hash = userId.split('').reduce((a, b) => {
+                    a = ((a << 5) - a) + b.charCodeAt(0);
+                    return a & a;
+                }, 0);
+                const names = ['Fashionista', 'StyleGuru', 'TrendSetter', 'ChicUser', 'VogueVibes', 'StyleIcon', 'FashionFan'];
+                const colors = ['Red', 'Blue', 'Green', 'Purple', 'Pink', 'Orange', 'Teal'];
+                const nameIndex = Math.abs(hash) % names.length;
+                const colorIndex = Math.abs(hash >> 3) % colors.length;
+                return colors[colorIndex] + names[nameIndex];
+            }
+            
+            return userId.length > 15 ? userId.substring(0, 12) + '...' : userId;
+        }
+
+        function copyToClipboard(text, button) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopySuccess(button);
+                }).catch(() => {
+                    fallbackCopy(text, button);
+                });
+            } else {
+                fallbackCopy(text, button);
+            }
+        }
+
+        function fallbackCopy(text, button) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showCopySuccess(button);
+            } catch (err) {
+                console.error('Could not copy text: ', err);
+                alert('Could not copy to clipboard. Room code: ' + text);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showCopySuccess(button) {
+            const originalText = button.innerHTML;
+            button.innerHTML = '✅ Copied!';
+            button.classList.add('copied');
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('copied');
+            }, 2000);
+        }
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        });
+
+        function closeMobileSidebar() {
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            }
+        }
 
         function connect() {
             const socket = new SockJS('/chat-websocket');
@@ -943,9 +1491,7 @@
             
             stompClient.connect({}, function(frame) {
                 console.log('Connected: ' + frame);
-                
                 subscribeToGlobalChat();
-                
             });
         }
 
@@ -970,7 +1516,7 @@
             loadGlobalMessages();
         }
 
-        function subscribeToRoom(roomCode, roomName) {
+        function subscribeToRoom(roomCode, roomNameText) {
             if (currentRoom && currentRoom.subscription) {
                 stompClient.unsubscribe(currentRoom.subscription);
             }
@@ -983,11 +1529,11 @@
                     }
                 }),
                 roomCode: roomCode,
-                name: roomName
+                name: roomNameText
             };
             
             isInRoom = true;
-            updateUIForRoom(roomName);
+            updateUIForRoom(roomNameText, roomCode);
             loadRoomMessages(roomCode);
             
             if (stompClient && stompClient.connected) {
@@ -1002,17 +1548,21 @@
         function updateUIForChat() {
             roomIndicator.classList.remove('active');
             leaveRoomBtn.style.display = 'none';
-            document.getElementById('roomSettingsBtn').style.display = 'none';
-            chatStatusText.textContent = 'Global Fashion Chat - Chat with StyleAI or start a conversation!';
+            shareRoomBtn.style.display = 'none';
+            currentRoomSection.style.display = 'none';
+            chatStatusText.textContent = 'Global Fashion Chat - Chat with StyleAI!';
             globalChatBtn.textContent = '🌍 Current: Global';
             messageInput.placeholder = 'Chat with @AI or other fashion enthusiasts...';
         }
 
-        function updateUIForRoom(roomNameText) {
+        function updateUIForRoom(roomNameText, roomCode) {
             roomIndicator.classList.add('active');
             roomName.textContent = roomNameText;
             leaveRoomBtn.style.display = 'block';
-            chatStatusText.textContent = `🏠 Private room: ${roomNameText}`;
+            shareRoomBtn.style.display = 'block';
+            currentRoomSection.style.display = 'block';
+            currentRoomCode.textContent = roomCode;
+            chatStatusText.textContent = `🏠 ${roomNameText}`;
             globalChatBtn.textContent = '🌍 Global Chat';
             messageInput.placeholder = 'Chat privately with @AI and room members...';
         }
@@ -1052,11 +1602,12 @@
                 avatarContent = '🤖';
                 displayUserName = 'StyleAI';
             } else if (isCurrentUser) {
-                avatarContent = displayName.charAt(0);
+                avatarContent = displayName.charAt(0).toUpperCase();
                 displayUserName = 'You';
             } else {
-                avatarContent = message.userId.charAt(0);
-                displayUserName = message.userId;
+                const friendlyName = generateDisplayName(message.userId);
+                avatarContent = friendlyName.charAt(0).toUpperCase();
+                displayUserName = friendlyName;
             }
             
             let content = `
@@ -1204,15 +1755,8 @@
                     createRoomModal.classList.remove('active');
                     createRoomForm.reset();
                     
-                    // Show room code with a better formatted message
-                    const message = `🎉 Room Created Successfully!\n\n` +
-                                  `Room Code: ${data.room.roomCode}\n` +
-                                  `Room Name: ${data.room.roomName}\n\n` +
-                                  `Share this code with friends to join your roast session!`;
-                    alert(message);
-                    
-                    // Auto-join the created room
-                    joinRoomByCode(data.room.roomCode, data.room.roomName);
+                    createdRoomData = data.room;
+                    showRoomCodeModal(data.room);
                 } else {
                     alert('Failed to create room: ' + data.message);
                 }
@@ -1224,7 +1768,6 @@
                 if (error.message) {
                     alert('Failed to create room: ' + error.message);
                 } else if (error.errors && error.errors.length > 0) {
-                    // Handle validation errors
                     const validationErrors = error.errors.map(err => err.defaultMessage).join('\n');
                     alert('Validation errors:\n' + validationErrors);
                 } else {
@@ -1232,10 +1775,67 @@
                 }
             })
             .finally(() => {
-                // Re-enable submit button
                 const submitBtn = createRoomForm.querySelector('button[type="submit"]');
                 submitBtn.disabled = false;
             });
+        }
+
+        function showRoomCodeModal(roomData) {
+            roomCodeDisplay.textContent = roomData.roomCode;
+            roomCodeModal.classList.add('active');
+        }
+
+        function copyRoomCode() {
+            const roomCode = roomCodeDisplay.textContent;
+            copyToClipboard(roomCode, copyRoomCodeBtn);
+        }
+
+        function shareRoom(platform) {
+            if (!createdRoomData) return;
+            
+            const roomCode = createdRoomData.roomCode;
+            const roomName = createdRoomData.roomName;
+            const message = `🎉 Join my StyleChat roast room "${roomName}"!\n\nRoom Code: ${roomCode}\n\nLet's roast some outfits together! 👗✨`;
+            const url = encodeURIComponent(window.location.origin);
+            
+            let shareUrl;
+            
+            switch (platform) {
+                case 'whatsapp':
+                    shareUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                    break;
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
+                    break;
+                case 'telegram':
+                    shareUrl = `https://t.me/share/url?url=${url}&text=${encodeURIComponent(message)}`;
+                    break;
+                case 'email':
+                    shareUrl = `mailto:?subject=${encodeURIComponent('Join my StyleChat room!')}&body=${encodeURIComponent(message)}`;
+                    break;
+            }
+            
+            if (shareUrl) {
+                window.open(shareUrl, '_blank');
+            }
+        }
+
+        function shareCurrentRoom() {
+            if (!isInRoom || !currentRoom.roomCode) return;
+            
+            const roomCode = currentRoom.roomCode;
+            const roomNameText = currentRoom.name;
+            const message = `🎉 Join my StyleChat roast room "${roomNameText}"!\n\nRoom Code: ${roomCode}\n\nLet's roast some outfits together! 👗✨`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Join my StyleChat room!',
+                    text: message
+                }).catch(console.error);
+            } else {
+                // Fallback to copying room code
+                copyToClipboard(roomCode, shareRoomBtn);
+            }
         }
 
         function joinRoom() {
@@ -1251,6 +1851,7 @@
             }
             
             showLoading('Joining room...');
+            closeMobileSidebar();
             
             fetch('/api/rooms/join', {
                 method: 'POST',
@@ -1348,7 +1949,7 @@
 
         function adjustTextareaHeight() {
             messageInput.style.height = 'auto';
-            messageInput.style.height = Math.min(messageInput.scrollHeight, 140) + 'px';
+            messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
         }
 
         sendBtn.addEventListener('click', (e) => {
@@ -1409,6 +2010,7 @@
         createRoomBtn.addEventListener('click', (e) => {
             e.preventDefault();
             createRoomModal.classList.add('active');
+            closeMobileSidebar();
         });
 
         joinRoomBtn.addEventListener('click', (e) => {
@@ -1429,11 +2031,31 @@
                 messagesContainer.innerHTML = '';
                 subscribeToGlobalChat();
             }
+            closeMobileSidebar();
         });
 
         leaveRoomBtn.addEventListener('click', (e) => {
             e.preventDefault();
             leaveRoom();
+        });
+
+        shareRoomBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            shareCurrentRoom();
+        });
+
+        roomIndicator.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isInRoom && currentRoom.roomCode) {
+                copyToClipboard(currentRoom.roomCode, roomIndicator);
+            }
+        });
+
+        copyCurrentRoomBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isInRoom && currentRoom.roomCode) {
+                copyToClipboard(currentRoom.roomCode, copyCurrentRoomBtn);
+            }
         });
 
         closeCreateModal.addEventListener('click', (e) => {
@@ -1454,11 +2076,222 @@
             }
         });
 
+        closeRoomCodeModal.addEventListener('click', (e) => {
+            e.preventDefault();
+            roomCodeModal.classList.remove('active');
+        });
+
+        roomCodeModal.addEventListener('click', (e) => {
+            if (e.target === roomCodeModal) {
+                roomCodeModal.classList.remove('active');
+            }
+        });
+
+        copyRoomCodeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            copyRoomCode();
+        });
+
+        joinCreatedRoomBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (createdRoomData) {
+                roomCodeModal.classList.remove('active');
+                joinRoomByCode(createdRoomData.roomCode, createdRoomData.roomName);
+            }
+        });
+
+        shareWhatsAppBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            shareRoom('whatsapp');
+        });
+
+        shareTwitterBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            shareRoom('twitter');
+        });
+
+        shareTelegramBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            shareRoom('telegram');
+        });
+
+        shareEmailBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            shareRoom('email');
+        });
+
         roomCodeInput.addEventListener('input', function(e) {
             e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         });
 
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024) {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 100);
+        });
+
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+            const inputs = document.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.style.fontSize = '16px';
+                });
+                input.addEventListener('blur', () => {
+                    input.style.fontSize = '';
+                });
+            });
+        }
+
+        let touchStartY = 0;
+        messagesContainer.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+
+        messagesContainer.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const touchDiff = touchStartY - touchY;
+            
+            if (Math.abs(touchDiff) > 5) {
+                messagesContainer.style.scrollBehavior = 'auto';
+            }
+        });
+
+        messagesContainer.addEventListener('touchend', () => {
+            setTimeout(() => {
+                messagesContainer.style.scrollBehavior = 'smooth';
+            }, 150);
+        });
+
         connect();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(() => console.log('Service Worker registered'))
+                    .catch(() => console.log('Service Worker registration failed'));
+            });
+        }
+
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('PWA install available');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            deferredPrompt = null;
+        });
+
+        window.addEventListener('online', () => {
+            if (!stompClient || !stompClient.connected) {
+                connect();
+            }
+            showLoading('Reconnecting...');
+            setTimeout(hideLoading, 1000);
+        });
+
+        window.addEventListener('offline', () => {
+            showLoading('You are offline');
+            setTimeout(() => {
+                loadingText.textContent = 'Waiting for connection...';
+            }, 2000);
+        });
+
+        let keyboardHeight = 0;
+        
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                const newKeyboardHeight = window.innerHeight - window.visualViewport.height;
+                
+                if (newKeyboardHeight > 150) {
+                    keyboardHeight = newKeyboardHeight;
+                    document.body.style.paddingBottom = keyboardHeight + 'px';
+                    
+                    setTimeout(() => {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, 100);
+                } else {
+                    keyboardHeight = 0;
+                    document.body.style.paddingBottom = '';
+                }
+            });
+        }
+
+        const touchElements = document.querySelectorAll('.btn, .message-avatar, .tip, .room-indicator');
+        touchElements.forEach(element => {
+            element.addEventListener('touchstart', () => {
+                element.style.opacity = '0.7';
+            });
+            
+            element.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    element.style.opacity = '';
+                }, 150);
+            });
+            
+            element.addEventListener('touchcancel', () => {
+                element.style.opacity = '';
+            });
+        });
+
+        let loadingTimeout;
+        function showLoading(text = 'StyleAI is analyzing...') {
+            loadingText.textContent = text;
+            loadingIndicator.classList.add('active');
+            
+            if (window.innerWidth <= 768) {
+                clearTimeout(loadingTimeout);
+                loadingTimeout = setTimeout(() => {
+                    hideLoading();
+                }, 30000);
+            }
+        }
+
+        function hideLoading() {
+            loadingIndicator.classList.remove('active');
+            clearTimeout(loadingTimeout);
+        }
+
+        window.addEventListener('error', (e) => {
+            console.error('JavaScript error:', e.error);
+            if (loadingIndicator.classList.contains('active')) {
+                hideLoading();
+            }
+        });
+
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+
+        function handleConnectionLoss() {
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                showLoading(`Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`);
+                
+                setTimeout(() => {
+                    connect();
+                }, reconnectAttempts * 2000);
+            } else {
+                hideLoading();
+                alert('Connection lost. Please refresh the page to reconnect.');
+            }
+        }
+
+        setInterval(() => {
+            if (stompClient && !stompClient.connected && navigator.onLine) {
+                handleConnectionLoss();
+            } else if (stompClient && stompClient.connected) {
+                reconnectAttempts = 0;
+            }
+        }, 10000);
     </script>
 </body>
 </html>
